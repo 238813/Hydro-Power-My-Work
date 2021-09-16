@@ -80,9 +80,45 @@ package Hydro_Power_My_Work
             coordinateSystem(preserveAspectRatio=false)));
     end Motor;
 
-    package MotorDrive
-
-    end MotorDrive;
+    model Motor_Drive
+      Motor motor(
+        resistor(R=0.5),
+        inductor(L=0.05),
+        inertia(J=0.001))
+        annotation (Placement(transformation(extent={{-4,-10},{16,10}})));
+      Modelica.Blocks.Math.Feedback feedback
+        annotation (Placement(transformation(extent={{-64,-10},{-44,10}})));
+      Modelica.Blocks.Continuous.PID PID
+        annotation (Placement(transformation(extent={{-38,-10},{-18,10}})));
+      Modelica.Blocks.Sources.Step step(startTime=0.5)
+        annotation (Placement(transformation(extent={{-88,-10},{-68,10}})));
+      Modelica.Mechanics.Rotational.Components.IdealGear idealGear(ratio=100)
+        annotation (Placement(transformation(extent={{26,-10},{46,10}})));
+      Modelica.Mechanics.Rotational.Components.Inertia inertia(J=5)
+        annotation (Placement(transformation(extent={{52,-10},{72,10}})));
+      Modelica.Mechanics.Rotational.Sensors.AngleSensor angleSensor annotation
+        (Placement(transformation(
+            extent={{-10,-10},{10,10}},
+            rotation=180,
+            origin={54,-38})));
+    equation
+      connect(feedback.y, PID.u)
+        annotation (Line(points={{-45,0},{-40,0}}, color={0,0,127}));
+      connect(motor.u, PID.y) annotation (Line(points={{-6,1},{-10,1},{-10,0},{
+              -17,0}}, color={0,0,127}));
+      connect(feedback.u1, step.y)
+        annotation (Line(points={{-62,0},{-67,0}}, color={0,0,127}));
+      connect(idealGear.flange_a, motor.flange) annotation (Line(points={{26,0},
+              {24,0},{24,1},{14.6,1}}, color={0,0,0}));
+      connect(idealGear.flange_b, inertia.flange_a)
+        annotation (Line(points={{46,0},{52,0}}, color={0,0,0}));
+      connect(inertia.flange_b, angleSensor.flange)
+        annotation (Line(points={{72,0},{72,-38},{64,-38}}, color={0,0,0}));
+      connect(angleSensor.phi, feedback.u2) annotation (Line(points={{43,-38},{
+              -54,-38},{-54,-8}}, color={0,0,127}));
+      annotation (Icon(coordinateSystem(preserveAspectRatio=false)), Diagram(
+            coordinateSystem(preserveAspectRatio=false)));
+    end Motor_Drive;
   end Tut_02;
   annotation (uses(Modelica(version="3.2.3")));
 end Hydro_Power_My_Work;
